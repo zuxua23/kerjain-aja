@@ -11,9 +11,11 @@
       "**/.*",
       "**/node_modules/**",
       "FIREBASE-SETUP.md",
+      "README.md",
       "_check/**",
       "scraps/**",
       "uploads/**",
+      "public/**",
       "firestore.rules",
       "firestore.indexes.json"
     ],

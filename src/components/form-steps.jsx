@@ -1,14 +1,5 @@
-/* global React */
 const { useState, useRef, useEffect } = React;
 
-// ============================================
-// SHARED HELPERS
-// ============================================
-// NOTE: pricing removed — harga & DP didiskusikan langsung via WA setelah order masuk.
-
-// ============================================
-// SERVICES
-// ============================================
 const SERVICES = [
   {
     id: 'uml-db',
