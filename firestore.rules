@@ -1,0 +1,58 @@
+// Firestore Security Rules — Kerjain Aja
+// Deploy: firebase deploy --only firestore:rules
+//
+// Model akses:
+//   - orders/{id}:
+//       * create: SIAPA AJA (customer ngirim order tanpa login). Hanya field yang diizinkan.
+//       * read/update/delete: hanya admin (user terautentikasi).
+//   - config/main, settings/studio:
+//       * read: SIAPA AJA (customer form butuh baca tech stack & config aktif).
+//       * write: hanya admin.
+//   - Default deny untuk path lain.
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null && request.auth.uid != null;
+    }
+
+    // === ORDERS ===
+    match /orders/{orderId} {
+
+      // Customer create: validasi struktur dasar & batasi ukuran payload
+      allow create: if validNewOrder(request.resource.data);
+
+      // Admin only
+      allow read, update, delete: if isSignedIn();
+    }
+
+    function validNewOrder(d) {
+      return d.keys().hasAll(['code', 'status', 'form', 'createdAt'])
+        && d.status == 'pending'
+        && d.code is string && d.code.size() <= 32
+        && d.form is map
+        && d.form.name is string && d.form.name.size() <= 120
+        && d.form.wa is string && d.form.wa.size() <= 20
+        && (!('invoice' in d) || d.invoice == null);
+    }
+
+    // === CONFIG ===
+    match /config/{docId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    // === SETTINGS ===
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isSignedIn();
+    }
+
+    // === Default deny ===
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
