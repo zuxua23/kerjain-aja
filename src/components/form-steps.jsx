@@ -114,7 +114,7 @@ function StepIdentity({ form, setForm, errors }) {
 
       <a
         className="quick-wa-banner"
-        href={`https://wa.me/6281234567890?text=${encodeURIComponent('Halo Admin Kerjain Aja! 👋 Saya ingin konsultasi mengenai pembuatan aplikasi.')}`}
+        href={`https://wa.me/6287712647922?text=${encodeURIComponent('Halo Admin Kerjain Aja! 👋 Saya ingin konsultasi mengenai pembuatan aplikasi.')}`}
         target="_blank"
         rel="noopener"
       >
