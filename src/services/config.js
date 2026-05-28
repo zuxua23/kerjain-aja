@@ -11,10 +11,10 @@ window.KA = window.KA || {};
 KA.BRAND = {
   name: 'Kerjain Aja',
   short: 'K.A',
-  logo: '<K.A/>',
+  logo: '{K.A}',
   tagline: 'Jasa coding & build aplikasi',
 };
-KA.ADMIN_WA = '6281234567890';
+KA.ADMIN_WA = '6285111212455';
 
 // ============================================
 // DEFAULT CONFIG (used when localStorage is empty / a key is missing)

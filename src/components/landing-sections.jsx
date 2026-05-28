@@ -1,9 +1,4 @@
-/* global React, SalesAppMockup, InventoryAppMockup, SalesAppDemo, InventoryAppDemo */
 const { useEffect: lpUseEffect, useState: lpUseState } = React;
-
-// =================================================================
-// ICON LIBRARY (line icons, 24×24, stroke 1.8)
-// =================================================================
 const I = {
   folder: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/><path d="M3 11h18"/></svg>,
   money: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3v18"/><path d="M16 7c0-1.7-1.8-3-4-3s-4 1.3-4 3 1.8 3 4 3 4 1.3 4 3-1.8 3-4 3-4-1.3-4-3"/></svg>,
@@ -190,22 +185,22 @@ function ShowcaseSection() {
 // TRUST / PRESTASI
 // =================================================================
 const TECH_STACK = [
-  { name: 'React',     color: '#61DAFB', glyph: 'R'  },
-  { name: 'Next.js',   color: '#000000', glyph: 'N'  },
-  { name: 'Flutter',   color: '#02569B', glyph: 'Fl' },
-  { name: 'Node.js',   color: '#339933', glyph: 'No' },
-  { name: 'Firebase',  color: '#FFA000', glyph: 'F'  },
-  { name: 'Supabase',  color: '#3ECF8E', glyph: 'Sb' },
-  { name: 'Laravel',   color: '#FF2D20', glyph: 'L'  },
+  { name: 'React', color: '#61DAFB', glyph: 'R'  },
+  { name: 'Next.js', color: '#000000', glyph: 'N'  },
+  { name: 'python', color: '#02569B', glyph: 'P' },
+  { name: 'Node.js', color: '#339933', glyph: 'No' },
+  { name: 'Firebase', color: '#FFA000', glyph: 'F'  },
+  { name: 'Supabase', color: '#3ECF8E', glyph: 'Sb' },
+  { name: 'Laravel', color: '#FF2D20', glyph: 'L'  },
   { name: 'PostgreSQL',color: '#336791', glyph: 'Pg' },
-  { name: 'MySQL',     color: '#00758F', glyph: 'My' },
-  { name: 'Tailwind',  color: '#06B6D4', glyph: 'Tw' },
-  { name: 'TypeScript',color: '#3178C6', glyph: 'Ts' },
-  { name: 'Figma',     color: '#A259FF', glyph: 'Fg' },
-  { name: 'Vercel',    color: '#000000', glyph: 'V'  },
-  { name: 'Docker',    color: '#2496ED', glyph: 'Dk' },
-  { name: 'Stripe',    color: '#635BFF', glyph: 'St' },
-  { name: 'Midtrans',  color: '#1F8AE0', glyph: 'Mt' },
+  { name: 'MySQL', color: '#00758F', glyph: 'My' },
+  { name: 'SQL Server',  color: '#06B6D4', glyph: 'MS' },
+  { name: 'Java',color: '#3178C6', glyph: 'J' },
+  { name: 'Figma', color: '#A259FF', glyph: 'Fg' },
+  { name: 'ASP.NET', color: '#000000', glyph: 'AN'  },
+  { name: 'Android Java', color: '#2496ED', glyph: 'AJ' },
+  { name: 'Android Kontlin', color: '#635BFF', glyph: 'AK' },
+  { name: 'C#',  color: '#1F8AE0', glyph: 'C#' },
 ];
 
 function TrustSection() {
@@ -272,7 +267,6 @@ const JOKI_PERKS = [
 
 const JOKI_TAGS = [
   { label: 'Tugas Akhir', hot: true },
-  { label: 'Skripsi (IT)' },
   { label: 'Project UAS / UTS' },
   { label: 'Tubes Pemrograman' },
   { label: 'Web App Kuliah' },
@@ -365,7 +359,7 @@ function JokiSection() {
 // =================================================================
 // FINAL CTA
 // =================================================================
-const WA_NUM = '6281234567890'; // ganti di sini buat update nomor WA
+const WA_NUM = '6285111212455'; 
 const WA_MSG = 'Halo%20Kerjain%20Aja%21%20Gw%20mau%20konsultasi%20gratis%20soal%20bikin%20aplikasi%20buat%20bisnis%20gw.';
 
 function FinalCTA() {

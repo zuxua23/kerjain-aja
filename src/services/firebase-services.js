@@ -235,7 +235,7 @@
   // SETTINGS (settings/studio)
   // ============================================
   const Settings = {
-    DEFAULT: { studioName: 'Kerjain Aja', adminWa: '6281234567890', signerName: '' },
+    DEFAULT: { studioName: 'Kerjain Aja', adminWa: '6285111212455', signerName: '' },
 
     subscribe(cb, onError) {
       return db.collection(COLL.settings).doc('studio').onSnapshot(

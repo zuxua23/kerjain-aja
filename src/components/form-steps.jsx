@@ -1,14 +1,5 @@
-/* global React */
 const { useState, useRef, useEffect } = React;
 
-// ============================================
-// SHARED HELPERS
-// ============================================
-// NOTE: pricing removed — harga & DP didiskusikan langsung via WA setelah order masuk.
-
-// ============================================
-// SERVICES
-// ============================================
 const SERVICES = [
   {
     id: 'uml-db',
@@ -37,11 +28,6 @@ const SERVICES = [
   },
 ];
 
-// ============================================
-// CATEGORIES (Scope)
-// Note: Operasi (CRUD/laporan) & tipe data dikelola admin via halaman Konfigurasi.
-// Lihat config.js + window.KA.getOpsForCategory / KA.getActiveDataTypes.
-// ============================================
 const CATEGORIES = [
   { key: 'master',    label: 'Master Data', desc: 'Tabel data utama (pengguna, produk, kategori)', namePh: 'Contoh: Produk',          hasOps: true },
   { key: 'transaksi', label: 'Transaksi',   desc: 'Modul pencatatan transaksi & alurnya',          namePh: 'Contoh: Penjualan',        hasOps: true },
