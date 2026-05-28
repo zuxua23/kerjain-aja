@@ -46,6 +46,109 @@
   --shadow-lg: 0 12px 40px rgba(60, 40, 20, 0.10);
 }
 
+/* ===== Form page — match landing page blue palette ===== */
+body.form-body {
+  --bg: #EEF5FF;
+  --bg-card: #FFFFFF;
+  --bg-elev: #FFFFFF;
+  --bg-subtle: #DCEAFE;
+  --border: #C7DCF7;
+  --border-strong: #B4D4FF;
+  --text: #0A2533;
+  --text-muted: #486274;
+  --text-faint: #7A95A6;
+  --primary: #176B87;
+  --primary-hover: #0F4E66;
+  --primary-soft: rgba(23, 107, 135, 0.10);
+  --accent: #22C55E;
+  --shadow-sm: 0 1px 2px rgba(10, 37, 51, 0.04);
+  --shadow-md: 0 6px 24px rgba(10, 37, 51, 0.07);
+  --shadow-lg: 0 16px 48px rgba(10, 37, 51, 0.10);
+  background-image:
+    radial-gradient(rgba(23, 107, 135, 0.04) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* Topbar gets a stronger treatment to match landing nav */
+body.form-body .topbar {
+  background:
+    linear-gradient(135deg, #0F4E66 0%, #176B87 55%, #1F7E9E 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 8px 24px -12px rgba(10, 37, 51, 0.35);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+body.form-body .topbar::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0; bottom: -1px;
+  height: 2px;
+  background: linear-gradient(90deg, #86B6F6 0%, #B4D4FF 50%, #EEF5FF 100%);
+  opacity: 0.85;
+  pointer-events: none;
+}
+body.form-body .topbar .logo {
+  color: #FFFFFF;
+  text-decoration: none;
+}
+body.form-body .topbar .logo-mark {
+  background: linear-gradient(135deg, #EEF5FF 0%, #B4D4FF 60%, #86B6F6 100%);
+  color: #0F4E66;
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.45) inset,
+    0 4px 12px rgba(0, 0, 0, 0.18),
+    0 0 0 4px rgba(134, 182, 246, 0.18);
+}
+body.form-body .topbar-meta {
+  color: rgba(238, 245, 255, 0.78);
+}
+body.form-body .topbar-meta .dot-secure {
+  background: #22C55E;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25);
+}
+
+/* "Kembali ke Landing" button — light pill on dark nav */
+.btn-back-landing {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  letter-spacing: -0.005em;
+  background: rgba(255, 255, 255, 0.10);
+  color: rgba(238, 245, 255, 0.92);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: all 0.18s ease;
+}
+.btn-back-landing:hover {
+  background: linear-gradient(135deg, #EEF5FF 0%, #B4D4FF 100%);
+  color: #0F4E66;
+  border-color: transparent;
+  transform: translateY(-1px);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.6) inset,
+    0 6px 16px rgba(134, 182, 246, 0.35);
+}
+.btn-back-landing svg {
+  width: 14px; height: 14px;
+  transition: transform 0.18s;
+}
+.btn-back-landing:hover svg { transform: translateX(-2px); }
+
+/* Stepper sits below the colored topbar — soften its bg */
+body.form-body .stepper-wrap {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+}
+
 /* Dark Dev theme */
 [data-theme="dark"] {
   --bg: #0E0E12;
@@ -786,161 +889,10 @@ input:focus, textarea:focus, select:focus { outline: none; }
   font-size: 18px; flex-shrink: 0;
 }
 
-/* ===== PAYMENT ===== */
-.payment-banner {
-  background: var(--primary-soft);
-  border: 1.5px solid color-mix(in oklch, var(--primary) 30%, transparent);
-  border-radius: var(--radius-md);
-  padding: 14px 18px;
-  margin-bottom: 18px;
-  display: flex; align-items: center; gap: 14px;
-}
-.payment-banner-icon {
-  width: 36px; height: 36px;
-  border-radius: 10px;
-  background: var(--primary);
-  color: white;
-  display: grid; place-items: center;
-  font-size: 18px; flex-shrink: 0;
-}
-.payment-banner-text {
-  font-size: 13px;
-  color: var(--text);
-}
-.payment-banner-text strong {
-  color: var(--primary);
-}
-
-.method-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-}
-@media (max-width: 600px) { .method-grid { grid-template-columns: 1fr; } }
-.method-card {
-  padding: 14px 16px;
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  display: flex; align-items: center; gap: 12px;
-  background: var(--bg);
-  transition: all 0.15s;
-}
-.method-card:hover { border-color: var(--border-strong); }
-.method-card.selected {
-  border-color: var(--primary);
-  background: var(--primary-soft);
-}
-.method-logo {
-  width: 38px; height: 38px;
-  border-radius: 9px;
-  background: var(--bg-card);
-  display: grid; place-items: center;
-  font-weight: 700; font-size: 12px;
-  border: 1px solid var(--border);
-  flex-shrink: 0;
-  font-family: var(--font-mono);
-}
-.method-name { font-weight: 600; font-size: 14px; }
-.method-detail { font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 2px; }
-.method-radio {
-  margin-left: auto;
-  width: 18px; height: 18px;
-  border-radius: 50%;
-  border: 1.5px solid var(--border-strong);
-  position: relative;
-}
-.method-card.selected .method-radio { border-color: var(--primary); }
-.method-card.selected .method-radio::after {
-  content: '';
-  position: absolute; inset: 3px;
-  border-radius: 50%;
-  background: var(--primary);
-}
-
-.account-card {
-  margin-top: 14px;
-  background: var(--bg-subtle);
-  border: 1.5px dashed var(--border-strong);
-  border-radius: var(--radius-md);
-  padding: 16px;
-}
-.account-row {
-  display: flex; justify-content: space-between; align-items: center;
-  gap: 10px;
-  padding: 6px 0;
-  font-size: 13px;
-}
-.account-label { color: var(--text-muted); font-weight: 500; }
-.account-val {
-  font-family: var(--font-mono);
-  font-weight: 600;
-  display: flex; align-items: center; gap: 8px;
-}
-.copy-btn {
-  font-size: 11px;
-  padding: 4px 10px;
-  border-radius: 6px;
-  background: var(--bg-card);
-  border: 1px solid var(--border);
-  font-weight: 600;
-  color: var(--primary);
-  transition: all 0.15s;
-}
-.copy-btn:hover { background: var(--primary-soft); }
-.copy-btn.copied { background: var(--accent); color: white; border-color: var(--accent); }
-
-/* ===== UPLOAD ===== */
-.upload-zone {
-  border: 2px dashed var(--border-strong);
-  border-radius: var(--radius-lg);
-  padding: 32px 20px;
-  text-align: center;
-  background: var(--bg);
-  transition: all 0.2s;
-  cursor: pointer;
-}
-.upload-zone:hover, .upload-zone.dragging {
-  border-color: var(--primary);
-  background: var(--primary-soft);
-}
-.upload-icon {
-  width: 48px; height: 48px;
-  margin: 0 auto 12px;
-  border-radius: 12px;
-  background: var(--primary-soft);
-  color: var(--primary);
-  display: grid; place-items: center;
-  font-size: 22px;
-}
-.upload-title { font-weight: 600; font-size: 15px; }
-.upload-hint { font-size: 12px; color: var(--text-muted); margin-top: 6px; font-family: var(--font-mono); }
-
-.upload-preview {
-  border: 1.5px solid var(--border);
-  border-radius: var(--radius-md);
-  padding: 12px;
-  display: flex; gap: 12px; align-items: center;
-  background: var(--bg);
-}
-.upload-thumb {
-  width: 56px; height: 56px;
-  border-radius: 8px;
-  background: var(--bg-subtle);
-  overflow: hidden;
-  flex-shrink: 0;
-  display: grid; place-items: center;
-  font-size: 24px;
-}
-.upload-thumb img { width: 100%; height: 100%; object-fit: cover; }
-.upload-info { flex: 1; min-width: 0; }
-.upload-name { font-weight: 600; font-size: 14px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
-.upload-meta { font-size: 12px; color: var(--text-muted); font-family: var(--font-mono); margin-top: 2px; }
-.upload-remove {
-  color: var(--text-faint); padding: 8px;
-  border-radius: 8px;
-}
-.upload-remove:hover { color: var(--danger); background: var(--bg-subtle); }
+/* ===== PAYMENT / UPLOAD =====
+   Fitur pembayaran & upload bukti transfer sudah dihapus dari web —
+   harga & DP didiskusikan via WhatsApp. Style block lama dibersihkan 2026-05.
+   ============================================================ */
 
 /* ===== SUCCESS ===== */
 .success-shell {

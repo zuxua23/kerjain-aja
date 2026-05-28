@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="id" class="landing-html">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Kontak — Kerjain Aja</title>
+<meta name="description" content="Hubungi tim Kerjain Aja via WhatsApp, Instagram, atau email. Balas chat kurang dari 15 menit di jam kerja." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&family=Newsreader:ital,wght@1,400;1,500;1,600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="src/styles/styles.css" />
+<link rel="stylesheet" href="src/styles/landing.css" />
+<style>
+  /* ===== Kontak page-specific ===== */
+  .kontak-hero {
+    padding: 88px 28px 56px;
+    max-width: 1180px;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+  }
+  .kontak-hero::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 540px;
+    height: 380px;
+    background: radial-gradient(circle, color-mix(in oklch, var(--primary) 18%, transparent) 0%, transparent 60%);
+    filter: blur(50px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .kontak-hero-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+  }
+  .kontak-hero h1 {
+    font-size: clamp(40px, 5.8vw, 64px);
+    font-weight: 800;
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+    text-wrap: balance;
+    max-width: 760px;
+  }
+  .kontak-hero p {
+    font-size: clamp(16px, 1.7vw, 18px);
+    color: var(--text-muted);
+    max-width: 580px;
+    line-height: 1.55;
+    text-wrap: pretty;
+  }
+  .kontak-hero-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: 999px;
+    padding: 8px 16px 8px 12px;
+    font-size: 13px;
+    color: var(--text);
+    font-weight: 600;
+    box-shadow: var(--shadow-sm);
+  }
+  .kontak-hero-status-dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: #22C55E;
+    box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.18);
+    animation: kontakPulse 2s ease-in-out infinite;
+  }
+  @keyframes kontakPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5); }
+    50%      { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+  }
+
+  /* CHANNELS GRID */
+  .kontak-section {
+    padding: 32px 28px 72px;
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+  .kontak-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  @media (max-width: 880px) { .kontak-grid { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .kontak-grid { grid-template-columns: 1fr; } }
+
+  .kontak-card {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: 20px;
+    padding: 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.2s ease;
+    position: relative;
+    overflow: hidden;
+  }
+  .kontak-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #86B6F6, #176B87);
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .kontak-card:hover {
+    border-color: var(--border-strong);
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+  }
+  .kontak-card:hover::after { opacity: 1; }
+  .kontak-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .kontak-card-icon {
+    width: 48px; height: 48px;
+    border-radius: 14px;
+    display: grid; place-items: center;
+    color: white;
+    flex-shrink: 0;
+  }
+  .kontak-card-icon svg { width: 24px; height: 24px; }
+  .kontak-card-icon.wa { background: linear-gradient(135deg, #25D366, #128C7E); }
+  .kontak-card-icon.ig { background: linear-gradient(135deg, #F58529, #DD2A7B 50%, #8134AF); }
+  .kontak-card-icon.tt { background: linear-gradient(135deg, #25F4EE, #000000 70%, #FE2C55); }
+  .kontak-card-icon.email { background: linear-gradient(135deg, #86B6F6, #176B87); }
+  .kontak-card-icon.phone { background: linear-gradient(135deg, #176B87, #0F4E66); }
+  .kontak-card-icon.location { background: linear-gradient(135deg, #B4D4FF, #86B6F6); color: #0F4E66; }
+
+  .kontak-card-badge {
+    font-size: 10.5px;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--primary-soft);
+    color: var(--primary);
+  }
+  .kontak-card-badge.online {
+    background: rgba(34, 197, 94, 0.12);
+    color: #15803D;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .kontak-card-badge.online::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: #22C55E;
+    border-radius: 50%;
+  }
+  .kontak-card-label {
+    font-size: 11.5px;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-faint);
+  }
+  .kontak-card-title {
+    font-size: 19px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+  .kontak-card-value {
+    font-family: var(--font-mono);
+    font-size: 14.5px;
+    font-weight: 600;
+    color: var(--primary);
+    letter-spacing: -0.01em;
+    word-break: break-word;
+  }
+  .kontak-card-sub {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    line-height: 1.5;
+    margin-top: -4px;
+  }
+  .kontak-card-cta {
+    margin-top: auto;
+    padding-top: 6px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--primary);
+    letter-spacing: -0.005em;
+  }
+  .kontak-card-cta svg { width: 14px; height: 14px; transition: transform 0.2s; }
+  .kontak-card:hover .kontak-card-cta svg { transform: translateX(3px); }
+
+  /* INFO STRIP (Jam Operasional + Lokasi) */
+  .kontak-info {
+    margin-top: 32px;
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: 22px;
+    padding: 32px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+  }
+  @media (max-width: 720px) {
+    .kontak-info { grid-template-columns: 1fr; padding: 24px; }
+  }
+  .kontak-info-block {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .kontak-info-block + .kontak-info-block {
+    border-left: 1.5px solid var(--border);
+    padding-left: 28px;
+  }
+  @media (max-width: 720px) {
+    .kontak-info-block + .kontak-info-block {
+      border-left: none;
+      border-top: 1.5px solid var(--border);
+      padding-left: 0;
+      padding-top: 24px;
+    }
+  }
+  .kontak-info-head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .kontak-info-icon {
+    width: 38px; height: 38px;
+    border-radius: 10px;
+    display: grid; place-items: center;
+    background: var(--primary-soft);
+    color: var(--primary);
+    flex-shrink: 0;
+  }
+  .kontak-info-icon svg { width: 20px; height: 20px; }
+  .kontak-info-title {
+    font-weight: 800;
+    font-size: 16px;
+    letter-spacing: -0.015em;
+  }
+  .kontak-jam-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .kontak-jam-list li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    padding: 10px 14px;
+    background: var(--bg);
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    font-size: 14px;
+  }
+  .kontak-jam-list li.today {
+    background: var(--primary-soft);
+    border-color: color-mix(in oklch, var(--primary) 25%, transparent);
+    border-width: 1.5px;
+  }
+  .kontak-jam-day { font-weight: 600; color: var(--text); }
+  .kontak-jam-time {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    color: var(--text-muted);
+    font-size: 13px;
+  }
+  .kontak-jam-list li.today .kontak-jam-day { color: var(--primary); font-weight: 700; }
+  .kontak-jam-list li.today .kontak-jam-time { color: var(--primary); }
+  .kontak-jam-list li.closed .kontak-jam-time { color: var(--text-faint); font-style: italic; }
+  .kontak-jam-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(34, 197, 94, 0.12);
+    color: #15803D;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .kontak-jam-pill::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: #22C55E;
+    border-radius: 50%;
+  }
+
+  .kontak-lokasi-text {
+    font-size: 14.5px;
+    color: var(--text);
+    line-height: 1.55;
+  }
+  .kontak-lokasi-text strong { font-weight: 700; }
+  .kontak-lokasi-text .muted { color: var(--text-muted); }
+  .kontak-lokasi-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13.5px;
+    font-weight: 700;
+    color: var(--primary);
+    text-decoration: none;
+    margin-top: 4px;
+  }
+  .kontak-lokasi-link:hover { text-decoration: underline; }
+  .kontak-lokasi-link svg { width: 14px; height: 14px; }
+
+  /* BIG CTA */
+  .kontak-bigcta {
+    margin-top: 32px;
+    background:
+      radial-gradient(circle at 80% 20%, rgba(134, 182, 246, 0.35) 0%, transparent 55%),
+      radial-gradient(circle at 0% 100%, rgba(37, 211, 102, 0.28) 0%, transparent 55%),
+      linear-gradient(135deg, #0F4E66 0%, #176B87 60%, #1F7E9E 100%);
+    color: white;
+    border-radius: 24px;
+    padding: 48px 44px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 22px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 60px -20px rgba(15, 78, 102, 0.5);
+  }
+  @media (max-width: 720px) {
+    .kontak-bigcta { padding: 32px 24px; border-radius: 20px; }
+  }
+  .kontak-bigcta-text { display: flex; flex-direction: column; gap: 8px; max-width: 540px; }
+  .kontak-bigcta-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11.5px;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: rgba(238, 245, 255, 0.85);
+  }
+  .kontak-bigcta-eyebrow-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #25D366;
+    box-shadow: 0 0 0 4px rgba(37, 211, 102, 0.25);
+    animation: kontakPulse 2s ease-in-out infinite;
+  }
+  .kontak-bigcta h2 {
+    font-size: clamp(26px, 3.4vw, 36px);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    line-height: 1.1;
+    color: white;
+    text-wrap: balance;
+  }
+  .kontak-bigcta p {
+    font-size: 15px;
+    color: rgba(238, 245, 255, 0.75);
+    line-height: 1.55;
+  }
+  .kontak-bigcta-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #25D366, #128C7E);
+    color: white;
+    padding: 16px 26px;
+    border-radius: 14px;
+    font-size: 16px;
+    font-weight: 700;
+    text-decoration: none;
+    letter-spacing: -0.01em;
+    box-shadow: 0 8px 24px rgba(37, 211, 102, 0.4);
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .kontak-bigcta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(37, 211, 102, 0.55);
+  }
+  .kontak-bigcta-btn svg { width: 22px; height: 22px; }
+
+  /* FAQ MINI */
+  .kontak-faq {
+    margin-top: 32px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+  @media (max-width: 720px) { .kontak-faq { grid-template-columns: 1fr; } }
+  .kontak-faq-item {
+    background: var(--bg-card);
+    border: 1.5px solid var(--border);
+    border-radius: 14px;
+    padding: 20px 22px;
+  }
+  .kontak-faq-q {
+    font-weight: 700;
+    font-size: 14.5px;
+    letter-spacing: -0.01em;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .kontak-faq-q::before {
+    content: 'Q.';
+    color: var(--primary);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    font-weight: 800;
+    background: var(--primary-soft);
+    padding: 2px 7px;
+    border-radius: 6px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .kontak-faq-a {
+    font-size: 13.5px;
+    color: var(--text-muted);
+    line-height: 1.55;
+    padding-left: 32px;
+  }
+</style>
+</head>
+<body class="landing-body">
+
+<!-- ====== NAV (matches landing) ====== -->
+<nav class="lp-nav">
+  <div class="lp-nav-inner">
+    <a class="lp-nav-logo" href="index.html">
+      <span class="lp-nav-mark">KA</span>
+      <span>Kerjain Aja</span>
+    </a>
+    <div class="lp-nav-links">
+      <a class="lp-nav-link" href="index.html#masalah">Masalah</a>
+      <a class="lp-nav-link" href="index.html#showcase">Aplikasi Bisnis</a>
+      <a class="lp-nav-link" href="index.html#joki">Joki Project</a>
+      <a class="lp-nav-link" href="index.html#prestasi">Teknologi</a>
+      <a class="lp-nav-link" href="kontak.html" style="color:#fff;background:rgba(238,245,255,0.12)">Kontak</a>
+    </div>
+    <a class="lp-nav-cta" href="form.html">Pesan Sekarang →</a>
+  </div>
+</nav>
+
+<!-- ====== HERO ====== -->
+<section class="kontak-hero">
+  <div class="kontak-hero-inner">
+    <span class="kontak-hero-status">
+      <span class="kontak-hero-status-dot"></span>
+      Admin online — balas chat &lt; 15 menit
+    </span>
+    <h1>Mau <span class="lp-serif">ngobrol</span> dulu? <br>Ini cara <span class="lp-em">paling cepet</span>.</h1>
+    <p>Pilih channel yang paling nyaman buat lu. Konsultasi gratis, nggak ada paksaan, nggak ada drama jualan. Kami balas semua chat satu-satu.</p>
+  </div>
+</section>
+
+<!-- ====== CHANNELS GRID ====== -->
+<section class="kontak-section">
+  <div class="kontak-grid">
+
+    <!-- WhatsApp Admin 1 -->
+    <a class="kontak-card" href="https://wa.me/6281234567890?text=Halo%20Kerjain%20Aja%21%20Gw%20mau%20konsultasi" target="_blank" rel="noopener">
+      <div class="kontak-card-head">
+        <div class="kontak-card-icon wa">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.8-.9-2.1-1-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-.3-.2-1.3-.5-2.5-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5 0-.2 0-.4-.1-.5 0-.1-.7-1.6-.9-2.2-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1.1 1-1.1 2.5s1.1 3 1.3 3.2c.2.2 2.2 3.4 5.4 4.7.7.3 1.3.5 1.8.6.8.3 1.5.2 2 .1.6-.1 1.8-.7 2.1-1.5.3-.7.3-1.4.2-1.5-.1-.1-.3-.2-.6-.3ZM12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5.2-1.3c1.5.8 3.1 1.2 4.8 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2Zm0 18c-1.5 0-3-.4-4.3-1.1l-.3-.2-3.2.8.8-3.1-.2-.3C4.3 14.8 4 13.4 4 12c0-4.4 3.6-8 8-8s8 3.6 8 8-3.6 8-8 8Z"/></svg>
+        </div>
+        <span class="kontak-card-badge online">Online</span>
+      </div>
+      <div>
+        <div class="kontak-card-label">Admin 1 — Bisnis</div>
+        <div class="kontak-card-title">WhatsApp Utama</div>
+      </div>
+      <div class="kontak-card-value">+62 812-3456-7890</div>
+      <div class="kontak-card-sub">Buat konsultasi aplikasi bisnis, UMKM, & perusahaan. Recommended.</div>
+      <span class="kontak-card-cta">Chat sekarang
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </span>
+    </a>
+
+    <!-- WhatsApp Admin 2 -->
+    <a class="kontak-card" href="https://wa.me/6281298765432?text=Halo%2C%20gw%20mau%20konsultasi%20joki%20project%20kuliah" target="_blank" rel="noopener">
+      <div class="kontak-card-head">
+        <div class="kontak-card-icon wa">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.8-.9-2.1-1-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-.3-.2-1.3-.5-2.5-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5 0-.2 0-.4-.1-.5 0-.1-.7-1.6-.9-2.2-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1.1 1-1.1 2.5s1.1 3 1.3 3.2c.2.2 2.2 3.4 5.4 4.7.7.3 1.3.5 1.8.6.8.3 1.5.2 2 .1.6-.1 1.8-.7 2.1-1.5.3-.7.3-1.4.2-1.5-.1-.1-.3-.2-.6-.3ZM12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5.2-1.3c1.5.8 3.1 1.2 4.8 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2Zm0 18c-1.5 0-3-.4-4.3-1.1l-.3-.2-3.2.8.8-3.1-.2-.3C4.3 14.8 4 13.4 4 12c0-4.4 3.6-8 8-8s8 3.6 8 8-3.6 8-8 8Z"/></svg>
+        </div>
+        <span class="kontak-card-badge online">Online</span>
+      </div>
+      <div>
+        <div class="kontak-card-label">Admin 2 — Kampus</div>
+        <div class="kontak-card-title">WhatsApp Joki</div>
+      </div>
+      <div class="kontak-card-value">+62 812-9876-5432</div>
+      <div class="kontak-card-sub">Khusus joki project kuliah, tugas akhir, & skripsi. Anti drama.</div>
+      <span class="kontak-card-cta">Chat sekarang
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </span>
+    </a>
+
+    <!-- Instagram -->
+    <a class="kontak-card" href="https://instagram.com/kerjainaja.id" target="_blank" rel="noopener">
+      <div class="kontak-card-head">
+        <div class="kontak-card-icon ig">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
+        </div>
+        <span class="kontak-card-badge">DM Aktif</span>
+      </div>
+      <div>
+        <div class="kontak-card-label">Instagram Official</div>
+        <div class="kontak-card-title">@kerjainaja.id</div>
+      </div>
+      <div class="kontak-card-value">instagram.com/kerjainaja.id</div>
+      <div class="kontak-card-sub">Portofolio project terbaru, behind-the-scenes, & testimoni client.</div>
+      <span class="kontak-card-cta">Follow & DM
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </span>
+    </a>
+
+    <!-- TikTok -->
+    <a class="kontak-card" href="https://tiktok.com/@kerjainaja.id" target="_blank" rel="noopener">
+      <div class="kontak-card-head">
+        <div class="kontak-card-icon tt">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.6 2.6 0 1 1-2.6-2.6c.28 0 .54.05.79.13V9.78a5.85 5.85 0 0 0-.79-.05A5.69 5.69 0 1 0 15.5 15.4V9.01a7.34 7.34 0 0 0 4.27 1.37V7.3a4.32 4.32 0 0 1-3.17-1.48Z"/></svg>
+        </div>
+        <span class="kontak-card-badge">Viral 🔥</span>
+      </div>
+      <div>
+        <div class="kontak-card-label">TikTok Official</div>
+        <div class="kontak-card-title">@kerjainaja.id</div>
+      </div>
+      <div class="kontak-card-value">tiktok.com/@kerjainaja.id</div>
+      <div class="kontak-card-sub">Konten edukasi seputar bisnis, coding, & tips tugas akhir.</div>
+      <span class="kontak-card-cta">Tonton & Follow
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </span>
+    </a>
+
+    <!-- Email -->
+    <a class="kontak-card" href="mailto:halo@kerjainaja.id?subject=Konsultasi%20Project">
+      <div class="kontak-card-head">
+        <div class="kontak-card-icon email">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+        </div>
+        <span class="kontak-card-badge">Balas &lt; 24 jam</span>
+      </div>
+      <div>
+        <div class="kontak-card-label">Email Resmi</div>
+        <div class="kontak-card-title">Kontak Bisnis & Invoice</div>
+      </div>
+      <div class="kontak-card-value">halo@kerjainaja.id</div>
+      <div class="kontak-card-sub">Buat brief detail, kerjasama korporat, atau urusan invoice & PO.</div>
+      <span class="kontak-card-cta">Kirim email
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </span>
+    </a>
+
+    <!-- Telepon -->
+    <a class="kontak-card" href="tel:+622150999777">
+      <div class="kontak-card-head">
+        <div class="kontak-card-icon phone">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92Z"/></svg>
+        </div>
+        <span class="kontak-card-badge">Jam Kerja</span>
+      </div>
+      <div>
+        <div class="kontak-card-label">Kantor Pusat</div>
+        <div class="kontak-card-title">Telepon Langsung</div>
+      </div>
+      <div class="kontak-card-value">(021) 5099-7777</div>
+      <div class="kontak-card-sub">Senin–Jumat, 09:00–18:00 WIB. Cocok buat urusan formal & PO.</div>
+      <span class="kontak-card-cta">Telepon sekarang
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </span>
+    </a>
+
+  </div>
+
+  <!-- ====== INFO STRIP: Jam + Lokasi ====== -->
+  <div class="kontak-info">
+    <div class="kontak-info-block">
+      <div class="kontak-info-head">
+        <div class="kontak-info-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        </div>
+        <div>
+          <div class="kontak-info-title">Jam Operasional</div>
+          <div style="font-size:12.5px;color:var(--text-muted);margin-top:2px">Waktu Indonesia Barat (WIB)</div>
+        </div>
+        <span class="kontak-jam-pill" style="margin-left:auto">Buka</span>
+      </div>
+      <ul class="kontak-jam-list">
+        <li class="today">
+          <span class="kontak-jam-day">Senin (hari ini)</span>
+          <span class="kontak-jam-time">09:00 — 21:00</span>
+        </li>
+        <li><span class="kontak-jam-day">Selasa</span><span class="kontak-jam-time">09:00 — 21:00</span></li>
+        <li><span class="kontak-jam-day">Rabu</span><span class="kontak-jam-time">09:00 — 21:00</span></li>
+        <li><span class="kontak-jam-day">Kamis</span><span class="kontak-jam-time">09:00 — 21:00</span></li>
+        <li><span class="kontak-jam-day">Jumat</span><span class="kontak-jam-time">09:00 — 21:00</span></li>
+        <li><span class="kontak-jam-day">Sabtu</span><span class="kontak-jam-time">10:00 — 17:00</span></li>
+        <li class="closed"><span class="kontak-jam-day">Minggu</span><span class="kontak-jam-time">Libur</span></li>
+      </ul>
+    </div>
+
+    <div class="kontak-info-block">
+      <div class="kontak-info-head">
+        <div class="kontak-info-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s-7-7.58-7-13a7 7 0 0 1 14 0c0 5.42-7 13-7 13Z"/><circle cx="12" cy="9" r="2.5"/></svg>
+        </div>
+        <div>
+          <div class="kontak-info-title">Alamat Kantor</div>
+          <div style="font-size:12.5px;color:var(--text-muted);margin-top:2px">Walk-in by appointment</div>
+        </div>
+      </div>
+      <p class="kontak-lokasi-text">
+        <strong>Kerjain Aja Studio</strong><br>
+        Ruko Sentra Niaga Blok C-12, Lt. 2<br>
+        Jl. Kemang Raya No. 88<br>
+        Jakarta Selatan, 12730<br>
+        <span class="muted">Patokan: di sebelah Starbucks Kemang</span>
+      </p>
+      <a class="kontak-lokasi-link" href="https://maps.google.com/?q=Jl.+Kemang+Raya+88+Jakarta+Selatan" target="_blank" rel="noopener">
+        Buka di Google Maps
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+      </a>
+    </div>
+  </div>
+
+  <!-- ====== BIG CTA ====== -->
+  <div class="kontak-bigcta">
+    <div class="kontak-bigcta-text">
+      <span class="kontak-bigcta-eyebrow">
+        <span class="kontak-bigcta-eyebrow-dot"></span>
+        Konsultasi gratis · 30 menit
+      </span>
+      <h2>Bingung mulai dari mana? Chat aja dulu.</h2>
+      <p>Cerita kebutuhan bisnis atau spek tugas lu — kami kasih saran sistem, rough estimate budget, & timeline. Free, no strings attached.</p>
+    </div>
+    <a class="kontak-bigcta-btn" href="https://wa.me/6281234567890?text=Halo%20Kerjain%20Aja%21%20Gw%20mau%20konsultasi%20gratis" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.5 14.4c-.3-.1-1.8-.9-2.1-1-.3-.1-.5-.1-.7.1-.2.3-.7.9-.9 1.1-.2.2-.3.2-.6.1-.3-.2-1.3-.5-2.5-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6.1-.1.3-.3.4-.5.1-.2.2-.3.3-.5 0-.2 0-.4-.1-.5 0-.1-.7-1.6-.9-2.2-.2-.5-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1.1 1-1.1 2.5s1.1 3 1.3 3.2c.2.2 2.2 3.4 5.4 4.7.7.3 1.3.5 1.8.6.8.3 1.5.2 2 .1.6-.1 1.8-.7 2.1-1.5.3-.7.3-1.4.2-1.5-.1-.1-.3-.2-.6-.3ZM12 2C6.5 2 2 6.5 2 12c0 1.8.5 3.5 1.3 5L2 22l5.2-1.3c1.5.8 3.1 1.2 4.8 1.2 5.5 0 10-4.5 10-10S17.5 2 12 2Zm0 18c-1.5 0-3-.4-4.3-1.1l-.3-.2-3.2.8.8-3.1-.2-.3C4.3 14.8 4 13.4 4 12c0-4.4 3.6-8 8-8s8 3.6 8 8-3.6 8-8 8Z"/></svg>
+      Chat WhatsApp Sekarang
+    </a>
+  </div>
+
+  <!-- ====== FAQ MINI ====== -->
+  <div class="kontak-faq">
+    <div class="kontak-faq-item">
+      <div class="kontak-faq-q">Berapa lama biasanya admin bales?</div>
+      <p class="kontak-faq-a">Di jam kerja, rata-rata di bawah 15 menit. Di luar jam, kami bales pas buka esok harinya (paling lambat 24 jam).</p>
+    </div>
+    <div class="kontak-faq-item">
+      <div class="kontak-faq-q">Bisa dateng langsung ke kantor?</div>
+      <p class="kontak-faq-a">Bisa, tapi <strong>by appointment</strong> dulu via WhatsApp biar tim siap nerima & konsultasi nggak kepotong.</p>
+    </div>
+    <div class="kontak-faq-item">
+      <div class="kontak-faq-q">Konsultasi awal beneran gratis?</div>
+      <p class="kontak-faq-a">Iya, gratis. 30 menit obrolan via WA atau Zoom. Kami cuma minta brief jelas biar saran kami akurat.</p>
+    </div>
+    <div class="kontak-faq-item">
+      <div class="kontak-faq-q">Bisa NDA dulu sebelum cerita ide?</div>
+      <p class="kontak-faq-a">Tentu. Bilang aja di chat awal, kami kirim template NDA standar. Ide & data lu aman.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ====== FOOTER ====== -->
+<footer class="lp-footer">
+  <div class="lp-footer-inner">
+    <div class="lp-footer-meta">
+      © 2026 Kerjain Aja · Jasa Coding buat UMKM & Perusahaan
+    </div>
+    <div class="lp-footer-links">
+      <a href="index.html#masalah">Masalah</a>
+      <a href="index.html#showcase">Aplikasi Bisnis</a>
+      <a href="index.html#joki">Joki Project</a>
+      <a href="index.html#prestasi">Teknologi</a>
+      <a href="form.html">Pesan Jasa</a>
+      <a href="kontak.html">Kontak</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

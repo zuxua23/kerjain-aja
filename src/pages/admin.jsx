@@ -43,7 +43,28 @@ function useOrders() {
     return window.KAFire.Orders.saveInvoice(id, invoice);
   };
 
-  return { orders, loaded, error, refresh, updateStatus, remove, clearAll, saveInvoice };
+  const createManual = async ({ name, wa, email, customFields, notes }) => {
+    const code = 'MAN-' + Date.now().toString(36).toUpperCase().slice(-6);
+    const payload = {
+      code,
+      status: 'pending',
+      manual: true,
+      form: {
+        name: name || '',
+        wa: (wa || '').replace(/^\+?62/, '').replace(/\D/g, ''),
+        email: email || '',
+        customFields: (customFields || []).filter(f => f.label || f.value),
+        notes: notes || '',
+        services: [],
+      },
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+      invoice: null,
+    };
+    const ref = await window.KAFire.db.collection('orders').add(payload);
+    return { id: ref.id, code };
+  };
+
+  return { orders, loaded, error, refresh, updateStatus, remove, clearAll, saveInvoice, createManual };
 }
 
 // Demo seed removed — Firestore is source of truth, clean slate start.
@@ -193,7 +214,7 @@ function AdminAppInner({ user }) {
             <span className="admin-user-avatar">{(user.email || '?').slice(0, 1).toUpperCase()}</span>
             <span className="admin-user-email">{user.email}</span>
           </div>
-          <a href="index.html" className="admin-back-link">← Form pelanggan</a>
+          <a href="form.html" className="admin-back-link">← Form pelanggan</a>
         </div>
       </aside>
 
@@ -395,6 +416,7 @@ const STATUS_OPTIONS = [
 function PageOrders({ store, setDetailOrder }) {
   const [filter, setFilter] = useState('all');
   const [q, setQ] = useState('');
+  const [showManualModal, setShowManualModal] = useState(false);
 
   const filtered = useMemo(() => {
     return store.orders.filter(o => {
@@ -403,6 +425,28 @@ function PageOrders({ store, setDetailOrder }) {
       return true;
     });
   }, [store.orders, filter, q]);
+
+  const handleCreateManual = async (payload) => {
+    try {
+      const { id } = await store.createManual(payload);
+      setShowManualModal(false);
+      // Wait one tick for Firestore subscription to push the new order, then open it
+      setTimeout(() => {
+        const found = store.orders.find(o => o.id === id);
+        if (found) setDetailOrder(found);
+        else {
+          // Fallback — construct a temporary view from payload
+          setDetailOrder({
+            id, code: 'MAN-…', status: 'pending', manual: true,
+            createdAt: new Date().toISOString(),
+            form: { ...payload, services: [] },
+          });
+        }
+      }, 400);
+    } catch (e) {
+      alert('Gagal buat invoice manual: ' + e.message);
+    }
+  };
 
   return (
     <div>
@@ -427,8 +471,16 @@ function PageOrders({ store, setDetailOrder }) {
               </button>
             ))}
           </div>
+          <button className="admin-btn-primary" onClick={() => setShowManualModal(true)} type="button">+ Invoice Manual</button>
           <button className="admin-btn-danger-ghost" onClick={store.clearAll}>Hapus semua</button>
         </div>
+
+        {showManualModal && (
+          <ManualOrderModal
+            onClose={() => setShowManualModal(false)}
+            onSubmit={handleCreateManual}
+          />
+        )}
 
         <OrderTable orders={filtered} onRowClick={setDetailOrder} onDelete={(id, code) => store.remove(id, code)} />
 
@@ -461,21 +513,27 @@ function OrderTable({ orders, onRowClick, onDelete, compact }) {
         <tbody>
           {orders.map(o => {
             const status = STATUS_OPTIONS.find(s => s.id === o.status) || STATUS_OPTIONS[0];
-            const services = (o.form?.services || []).map(sid => ({
-              build: 'Build', 'uml-db': 'UML+DB', landing: 'Landing', revision: 'Revisi'
-            })[sid] || sid);
+            const isManual = !!o.manual;
+            const services = isManual
+              ? ['Manual']
+              : (o.form?.services || []).map(sid => ({
+                  build: 'Build', 'uml-db': 'UML+DB', landing: 'Landing', revision: 'Revisi'
+                })[sid] || sid);
             return (
               <tr key={o.code} onClick={() => onRowClick(o)} className="order-row">
-                <td className="mono"><strong>{o.code}</strong></td>
+                <td className="mono">
+                  <strong>{o.code}</strong>
+                  {isManual && <span className="manual-badge" style={{ marginLeft: 6 }}>M</span>}
+                </td>
                 <td>
                   <div className="cell-stack">
                     <div className="cell-strong">{o.form?.name || '—'}</div>
-                    <div className="cell-muted">+62{o.form?.wa}</div>
+                    {o.form?.wa && <div className="cell-muted">+62{o.form.wa}</div>}
                   </div>
                 </td>
                 <td>
                   <div className="svc-chips">
-                    {services.map((s, i) => <span key={i} className="svc-chip">{s}</span>)}
+                    {services.map((s, i) => <span key={i} className={'svc-chip' + (isManual ? ' manual' : '')}>{s}</span>)}
                   </div>
                 </td>
                 <td><span className={'status-pill tone-' + status.tone}>{status.label}</span></td>
@@ -495,10 +553,138 @@ function OrderTable({ orders, onRowClick, onDelete, compact }) {
 }
 
 // ============================================
+// MANUAL ORDER MODAL (admin creates order from scratch)
+// ============================================
+function ManualOrderModal({ onClose, onSubmit }) {
+  const [name, setName] = useState('');
+  const [wa, setWa] = useState('');
+  const [email, setEmail] = useState('');
+  const [notes, setNotes] = useState('');
+  const [customFields, setCustomFields] = useState([]);
+  const [submitting, setSubmitting] = useState(false);
+
+  const addField = () => {
+    setCustomFields(arr => [...arr, { id: 'cf-' + Date.now().toString(36) + Math.floor(Math.random()*1000), label: '', value: '' }]);
+  };
+  const updateField = (id, patch) => {
+    setCustomFields(arr => arr.map(f => f.id === id ? { ...f, ...patch } : f));
+  };
+  const removeField = (id) => {
+    setCustomFields(arr => arr.filter(f => f.id !== id));
+  };
+
+  const submit = async () => {
+    if (!name.trim()) {
+      alert('Nama customer wajib diisi.');
+      return;
+    }
+    setSubmitting(true);
+    await onSubmit({
+      name: name.trim(),
+      wa: wa.trim(),
+      email: email.trim(),
+      notes: notes.trim(),
+      customFields: customFields
+        .map(f => ({ label: (f.label || '').trim(), value: (f.value || '').trim() }))
+        .filter(f => f.label || f.value),
+    });
+    setSubmitting(false);
+  };
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal-card" onClick={e => e.stopPropagation()} style={{ maxWidth: 640 }}>
+        <div className="modal-head">
+          <div>
+            <div className="modal-eyebrow">Buat Manual</div>
+            <div className="modal-title">Invoice / BAST Manual</div>
+          </div>
+          <button className="modal-close" onClick={onClose}>×</button>
+        </div>
+        <div className="modal-body">
+          <div className="modal-section">
+            <div className="modal-section-title">Data Pelanggan</div>
+            <div className="settings-grid">
+              <div>
+                <label className="settings-label">Nama <span style={{ color: '#dc2626' }}>*</span></label>
+                <input className="admin-input" value={name} onChange={e => setName(e.target.value)} placeholder="Nama lengkap customer" autoFocus />
+              </div>
+              <div>
+                <label className="settings-label">No. WhatsApp</label>
+                <input
+                  className="admin-input"
+                  value={wa}
+                  onChange={e => setWa(e.target.value.replace(/\D/g, ''))}
+                  placeholder="81234567890 (tanpa +62)"
+                />
+              </div>
+              <div>
+                <label className="settings-label">Email</label>
+                <input className="admin-input" type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="customer@email.com" />
+              </div>
+            </div>
+          </div>
+
+          <div className="modal-section">
+            <div className="modal-section-title" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>Field Tambahan (opsional)</span>
+              <button className="admin-btn-ghost" type="button" onClick={addField} style={{ fontSize: 12, padding: '4px 10px' }}>+ Tambah field</button>
+            </div>
+            {customFields.length === 0 && (
+              <div style={{ fontSize: 12, color: 'var(--text-faint)', padding: '8px 0' }}>
+                Belum ada field tambahan. Contoh: Alamat, NPWP, Nama Perusahaan, dll.
+              </div>
+            )}
+            {customFields.map(f => (
+              <div key={f.id} className="cf-row">
+                <input
+                  className="admin-input"
+                  value={f.label}
+                  onChange={e => updateField(f.id, { label: e.target.value })}
+                  placeholder="Nama field (mis. Alamat)"
+                  style={{ flex: '0 0 38%' }}
+                />
+                <input
+                  className="admin-input"
+                  value={f.value}
+                  onChange={e => updateField(f.id, { value: e.target.value })}
+                  placeholder="Isi nilai…"
+                  style={{ flex: 1 }}
+                />
+                <button className="row-delete" type="button" onClick={() => removeField(f.id)} title="Hapus field">×</button>
+              </div>
+            ))}
+          </div>
+
+          <div className="modal-section">
+            <div className="modal-section-title">Catatan</div>
+            <textarea
+              className="admin-input"
+              rows="3"
+              value={notes}
+              onChange={e => setNotes(e.target.value)}
+              placeholder="Catatan internal soal customer ini (opsional)"
+            />
+          </div>
+
+          <div className="invoice-edit-actions" style={{ marginTop: 8 }}>
+            <button className="admin-btn-ghost" onClick={onClose} type="button" disabled={submitting}>Batal</button>
+            <button className="admin-btn-primary" onClick={submit} type="button" disabled={submitting || !name.trim()}>
+              {submitting ? 'Menyimpan…' : 'Buat & Lanjut Invoice →'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ============================================
 // ORDER DETAIL MODAL
 // ============================================
 function OrderDetailModal({ order, settings, onClose, onStatusChange, onSaveInvoice }) {
   const f = order.form || {};
+  const isManual = !!order.manual;
   const services = (f.services || []).map(sid => ({
     build: 'Build dari 0', 'uml-db': 'UML & Database', landing: 'Landing Page', revision: 'Revisi'
   })[sid] || sid);
@@ -508,8 +694,13 @@ function OrderDetailModal({ order, settings, onClose, onStatusChange, onSaveInvo
       <div className="modal-card" onClick={e => e.stopPropagation()}>
         <div className="modal-head">
           <div>
-            <div className="modal-eyebrow">Order Detail</div>
-            <div className="modal-title">{order.code}</div>
+            <div className="modal-eyebrow">
+              {isManual ? 'Manual Entry' : 'Order Detail'}
+            </div>
+            <div className="modal-title">
+              {order.code}
+              {isManual && <span className="manual-badge" style={{ marginLeft: 8 }}>MANUAL</span>}
+            </div>
           </div>
           <button className="modal-close" onClick={onClose}>×</button>
         </div>
@@ -533,37 +724,42 @@ function OrderDetailModal({ order, settings, onClose, onStatusChange, onSaveInvo
           <div className="modal-section">
             <div className="modal-section-title">Pelanggan</div>
             <DetailRow label="Nama" val={f.name || '—'} />
-            <DetailRow label="WhatsApp" val={
+            {f.wa && <DetailRow label="WhatsApp" val={
               <a href={`https://wa.me/62${f.wa}`} target="_blank" rel="noopener" className="link">+62{f.wa} →</a>
-            } />
+            } />}
             {f.email && <DetailRow label="Email" val={f.email} />}
+            {(f.customFields || []).map((cf, i) => (
+              <DetailRow key={i} label={cf.label || '—'} val={cf.value || '—'} />
+            ))}
             <DetailRow label="Tanggal Order" val={new Date(order.createdAt).toLocaleString('id-ID')} />
           </div>
 
-          <div className="modal-section">
-            <div className="modal-section-title">Jasa Dipilih</div>
-            <div className="svc-chips">
-              {services.map((s, i) => <span key={i} className="svc-chip lg">{s}</span>)}
+          {!isManual && services.length > 0 && (
+            <div className="modal-section">
+              <div className="modal-section-title">Jasa Dipilih</div>
+              <div className="svc-chips">
+                {services.map((s, i) => <span key={i} className="svc-chip lg">{s}</span>)}
+              </div>
+              {f.services?.includes('uml-db') && f.extras?.['uml-db'] && (
+                <UmlDbAdminBlock extras={f.extras['uml-db']} />
+              )}
+              {f.services?.includes('revision') && f.extras?.revision && (
+                <RevisionAdminBlock extras={f.extras.revision} />
+              )}
+              {['landing'].map(sid => {
+                const notes = f.extras?.[sid]?.notes;
+                if (!f.services?.includes(sid) || !notes) return null;
+                return (
+                  <div key={sid} className="modal-paragraph">
+                    <strong>Catatan Landing Page:</strong>
+                    <pre>{notes}</pre>
+                  </div>
+                );
+              })}
             </div>
-            {f.services?.includes('uml-db') && f.extras?.['uml-db'] && (
-              <UmlDbAdminBlock extras={f.extras['uml-db']} />
-            )}
-            {f.services?.includes('revision') && f.extras?.revision && (
-              <RevisionAdminBlock extras={f.extras.revision} />
-            )}
-            {['landing'].map(sid => {
-              const notes = f.extras?.[sid]?.notes;
-              if (!f.services?.includes(sid) || !notes) return null;
-              return (
-                <div key={sid} className="modal-paragraph">
-                  <strong>Catatan Landing Page:</strong>
-                  <pre>{notes}</pre>
-                </div>
-              );
-            })}
-          </div>
+          )}
 
-          {f.services?.includes('build') && f.buildMode === 'simple' && f.simpleBuild && (f.simpleBuild.description || f.simpleBuild.goal || f.simpleBuild.reference) && (
+          {!isManual && f.services?.includes('build') && f.buildMode === 'simple' && f.simpleBuild && (f.simpleBuild.description || f.simpleBuild.goal || f.simpleBuild.reference) && (
             <div className="modal-section">
               <div className="modal-section-title">Build dari 0 — Deskripsi Pelanggan</div>
               {f.simpleBuild.description && (
@@ -577,7 +773,7 @@ function OrderDetailModal({ order, settings, onClose, onStatusChange, onSaveInvo
             </div>
           )}
 
-          {(f.counts && Object.values(f.counts).some(v => v > 0)) && (
+          {!isManual && (f.counts && Object.values(f.counts).some(v => v > 0)) && (
             <div className="modal-section">
               <div className="modal-section-title">Cakupan Build (Teknis)</div>
               {f.scopeBackground && (
@@ -629,9 +825,11 @@ function OrderDetailModal({ order, settings, onClose, onStatusChange, onSaveInvo
             <InvoiceBlock order={order} settings={settings} onSave={onSaveInvoice} />
           </div>
 
-          <a className="modal-wa-cta" href={`https://wa.me/62${f.wa}?text=${encodeURIComponent(`Halo ${f.name}, pesanan ${order.code} sudah kami terima.`)}`} target="_blank" rel="noopener">
-            💬 Hubungi pelanggan via WhatsApp →
-          </a>
+          {f.wa && (
+            <a className="modal-wa-cta" href={`https://wa.me/62${f.wa}?text=${encodeURIComponent(`Halo ${f.name}, pesanan ${order.code} sudah kami terima.`)}`} target="_blank" rel="noopener">
+              💬 Hubungi pelanggan via WhatsApp →
+            </a>
+          )}
         </div>
       </div>
     </div>
@@ -1441,6 +1639,7 @@ const EMPTY_INVOICE = () => ({
   date: new Date().toISOString().slice(0, 10),
   dueDate: '',
   items: [{ desc: '', qty: 1, unitPrice: 0 }],
+  promo: { active: false, type: 'nominal', value: 0, label: '' },
   discount: 0,
   tax: 0,
   paid: 0,
@@ -1450,19 +1649,30 @@ const EMPTY_INVOICE = () => ({
   studioSigner: '',
 });
 
+function calcPromoAmount(promo, subtotal) {
+  if (!promo || !promo.active) return 0;
+  const v = Number(promo.value) || 0;
+  if (promo.type === 'percent') return Math.round((subtotal * v) / 100);
+  return Math.round(v);
+}
+
 function InvoiceBlock({ order, settings, onSave }) {
   const [editing, setEditing] = useState(false);
-  const [inv, setInv] = useState(() => order.invoice || EMPTY_INVOICE());
+  const [inv, setInv] = useState(() => {
+    const base = order.invoice || EMPTY_INVOICE();
+    return { ...EMPTY_INVOICE(), ...base, promo: { ...EMPTY_INVOICE().promo, ...(base.promo || {}) } };
+  });
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    setInv(order.invoice || EMPTY_INVOICE());
+    const base = order.invoice || EMPTY_INVOICE();
+    setInv({ ...EMPTY_INVOICE(), ...base, promo: { ...EMPTY_INVOICE().promo, ...(base.promo || {}) } });
   }, [order.id, order.invoice]);
 
   // Auto-fill invoice number on first edit if empty
   useEffect(() => {
     if (editing && !inv.number) {
-      setInv(s => ({ ...s, number: 'INV-' + (order.code || '').replace(/^DV-/, '') }));
+      setInv(s => ({ ...s, number: 'INV-' + (order.code || '').replace(/^(DV-|MAN-)/, '') }));
     }
     // eslint-disable-next-line
   }, [editing]);
@@ -1471,10 +1681,12 @@ function InvoiceBlock({ order, settings, onSave }) {
 
   const total = useMemo(() => {
     const sub = (inv.items || []).reduce((acc, it) => acc + (Number(it.qty) || 0) * (Number(it.unitPrice) || 0), 0);
-    const afterDisc = sub - (Number(inv.discount) || 0);
+    const promoAmt = calcPromoAmount(inv.promo, sub);
+    const afterPromo = sub - promoAmt;
+    const afterDisc = afterPromo - (Number(inv.discount) || 0);
     const withTax = afterDisc + (Number(inv.tax) || 0);
     const due = withTax - (Number(inv.paid) || 0);
-    return { sub, afterDisc, withTax, due };
+    return { sub, promoAmt, afterPromo, afterDisc, withTax, due };
   }, [inv]);
 
   const updItem = (i, patch) => {
@@ -1537,6 +1749,12 @@ function InvoiceBlock({ order, settings, onSave }) {
         {hasInvoice && (
           <div className="invoice-summary">
             <div><span>Subtotal</span><strong>{rupiah(total.sub)}</strong></div>
+            {order.invoice.promo?.active && total.promoAmt > 0 && (
+              <div>
+                <span>Promo{order.invoice.promo.label ? ` (${order.invoice.promo.label})` : ''}{order.invoice.promo.type === 'percent' ? ` ${Number(order.invoice.promo.value)||0}%` : ''}</span>
+                <strong>−{rupiah(total.promoAmt)}</strong>
+              </div>
+            )}
             {order.invoice.discount > 0 && <div><span>Diskon</span><strong>−{rupiah(order.invoice.discount)}</strong></div>}
             {order.invoice.tax > 0 && <div><span>Pajak</span><strong>+{rupiah(order.invoice.tax)}</strong></div>}
             <div className="invoice-summary-total"><span>Total</span><strong>{rupiah(total.withTax)}</strong></div>
@@ -1603,6 +1821,62 @@ function InvoiceBlock({ order, settings, onSave }) {
       <div className="invoice-totals">
         <div className="invoice-totals-grid">
           <div><span>Subtotal</span><strong>{rupiah(total.sub)}</strong></div>
+
+          <div className="invoice-promo-row" style={{ gridColumn: '1 / -1', padding: '10px 12px', background: 'rgba(217, 119, 87, 0.06)', border: '1px dashed rgba(217, 119, 87, 0.4)', borderRadius: 8 }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexWrap: 'wrap' }}>
+              <label className="konfig-toggle" style={{ margin: 0 }}>
+                <input
+                  type="checkbox"
+                  checked={!!inv.promo?.active}
+                  onChange={e => setInv(s => ({ ...s, promo: { ...(s.promo || EMPTY_INVOICE().promo), active: e.target.checked } }))}
+                />
+                <span className="konfig-toggle-track"><span className="konfig-toggle-thumb" /></span>
+                <span className="konfig-toggle-label" style={{ fontWeight: 700 }}>🎟️ Ada Promo</span>
+              </label>
+              {inv.promo?.active && (
+                <>
+                  <input
+                    className="admin-input"
+                    placeholder="Label promo (mis. BLACKFRIDAY)"
+                    value={inv.promo.label || ''}
+                    onChange={e => setInv(s => ({ ...s, promo: { ...s.promo, label: e.target.value } }))}
+                    style={{ flex: 1, minWidth: 160, padding: '6px 10px' }}
+                  />
+                  <div style={{ display: 'flex', gap: 4, background: 'var(--surface-1, #fff)', borderRadius: 6, padding: 3 }}>
+                    {[
+                      { id: 'nominal', label: 'Rp' },
+                      { id: 'percent', label: '%' },
+                    ].map(t => (
+                      <button
+                        key={t.id}
+                        type="button"
+                        onClick={() => setInv(s => ({ ...s, promo: { ...s.promo, type: t.id } }))}
+                        className={'promo-type-btn' + (inv.promo.type === t.id ? ' active' : '')}
+                        style={{
+                          padding: '4px 12px', border: 'none', borderRadius: 4, cursor: 'pointer', fontWeight: 700, fontSize: 12,
+                          background: inv.promo.type === t.id ? 'var(--accent, #D97757)' : 'transparent',
+                          color: inv.promo.type === t.id ? '#fff' : 'var(--text-muted, #555)',
+                        }}
+                      >{t.label}</button>
+                    ))}
+                  </div>
+                  <input
+                    className="admin-input"
+                    type="number"
+                    min="0"
+                    value={inv.promo.value || 0}
+                    onChange={e => setInv(s => ({ ...s, promo: { ...s.promo, value: e.target.value } }))}
+                    placeholder={inv.promo.type === 'percent' ? '10' : '50000'}
+                    style={{ width: 110, padding: '6px 10px' }}
+                  />
+                  <div style={{ fontWeight: 700, color: 'var(--accent, #D97757)', minWidth: 100, textAlign: 'right' }}>
+                    −{rupiah(total.promoAmt)}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+
           <div>
             <span>Diskon (Rp)</span>
             <input className="admin-input invoice-amount-input" type="number" min="0" value={inv.discount} onChange={e => setInv(s => ({ ...s, discount: e.target.value }))} />

@@ -185,7 +185,7 @@ function LoginApp() {
         </div>
       </form>
 
-      <a href="index.html" className="login-bottom-link">← Form pelanggan</a>
+      <a href="form.html" className="login-bottom-link">← Form pelanggan</a>
     </div>
   );
 }

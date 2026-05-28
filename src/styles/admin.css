@@ -1349,3 +1349,43 @@
   .invoice-totals-grid { max-width: none; }
   .invoice-amount-input { width: 110px; }
 }
+
+
+/* ============================================
+   MANUAL ORDER + CUSTOM FIELDS + PROMO
+   ============================================ */
+.manual-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #D97757, #c25a3d);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+.svc-chip.manual {
+  background: rgba(217, 119, 87, 0.12);
+  color: #c25a3d;
+  font-weight: 700;
+}
+
+/* Custom field row in ManualOrderModal */
+.cf-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.cf-row .admin-input {
+  padding: 8px 10px;
+  font-size: 13px;
+}
+
+/* Promo row in invoice editor (extra polish) */
+.invoice-promo-row .konfig-toggle {
+  margin-bottom: 0;
+}

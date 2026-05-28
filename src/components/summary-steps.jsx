@@ -1,9 +1,9 @@
-/* global React, CATEGORIES, OPS_CRUD, OPS_LAPORAN, TECH_GROUPS, TECH_FLAT, COLOR_PALETTES, SERVICES, ATTR_TYPES, CHART_TYPES */
-const { useState: usePS, useRef: useRefPS, useEffect: useEffectPS } = React;
+/* global React, CATEGORIES, TECH_GROUPS, COLOR_PALETTES, SERVICES, ATTR_TYPES */
+// ============================================
+// STEP — RINGKASAN  +  SUCCESS SCREEN
+// (Fitur pembayaran sudah dihapus — harga & DP didiskusikan via WhatsApp)
+// ============================================
 
-// ============================================
-// STEP — RINGKASAN
-// ============================================
 function StepSummary({ form }) {
   const paletteLabel = form.palette ? COLOR_PALETTES.find(p => p.id === form.palette)?.label : null;
 
@@ -218,180 +218,7 @@ function ItemSummary({ idx, cat, item }) {
 }
 
 // ============================================
-// STEP — KONFIRMASI METODE (no amounts)
-// ============================================
-const PAYMENT_METHODS = [
-  { id: 'bca', name: 'BCA Transfer', logo: 'BCA', detail: '8290-456-789 · a.n. Kerjain Aja' },
-  { id: 'mandiri', name: 'Mandiri Transfer', logo: 'MNDR', detail: '1410-0098-7654 · a.n. Kerjain Aja' },
-  { id: 'dana', name: 'DANA', logo: 'DANA', detail: '0812-3456-7890' },
-  { id: 'gopay', name: 'GoPay', logo: 'GO', detail: '0812-3456-7890' },
-  { id: 'qris', name: 'QRIS', logo: 'QR', detail: 'Scan dari semua e-wallet' },
-];
-
-function StepPayment({ form, setForm, errors }) {
-  const upd = (k, v) => setForm(f => ({ ...f, [k]: v }));
-  const [copied, setCopied] = usePS(null);
-  const [dragOver, setDragOver] = usePS(false);
-  const fileRef = useRefPS(null);
-
-  const selectedMethod = PAYMENT_METHODS.find(m => m.id === form.paymentMethod);
-
-  const copyAccount = (text) => {
-    navigator.clipboard?.writeText(text);
-    setCopied(text);
-    setTimeout(() => setCopied(null), 1500);
-  };
-
-  const handleFile = (file) => {
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { alert('Ukuran file maksimal 5MB'); return; }
-    const reader = new FileReader();
-    reader.onload = (e) => upd('proof', { name: file.name, size: file.size, dataUrl: e.target.result, type: file.type });
-    reader.readAsDataURL(file);
-  };
-
-  return (
-    <div className="step-content" data-screen-label="07 Konfirmasi">
-      <div className="step-header">
-        <div className="step-eyebrow">Step / Konfirmasi</div>
-        <h1 className="step-title">Pilih Metode Pembayaran Preferensi</h1>
-        <p className="step-subtitle">Pilih metode yang paling nyaman bagi Anda. Nominal & DP akan didiskusikan via WhatsApp setelah pesanan masuk.</p>
-      </div>
-
-      <div className="payment-banner">
-        <div className="payment-banner-icon">💬</div>
-        <div className="payment-banner-text">
-          <strong>Harga akan didiskusikan via WhatsApp.</strong> Setelah pesanan ini dikirim, admin akan menghubungi Anda untuk memberikan penawaran harga & instruksi transfer.
-        </div>
-      </div>
-
-      <div className="card">
-        <label className="label" style={{ marginBottom: 12 }}>Pilih Metode Pembayaran Preferensi</label>
-        <div className="method-grid">
-          {PAYMENT_METHODS.map(m => (
-            <div
-              key={m.id}
-              className={'method-card' + (form.paymentMethod === m.id ? ' selected' : '')}
-              onClick={() => upd('paymentMethod', m.id)}
-            >
-              <div className="method-logo" style={getLogoStyle(m.id)}>{m.logo}</div>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div className="method-name">{m.name}</div>
-                <div className="method-detail">{m.id === 'qris' ? 'Universal' : 'Ketuk untuk melihat detail'}</div>
-              </div>
-              <div className="method-radio" />
-            </div>
-          ))}
-        </div>
-
-        {errors.paymentMethod && <div className="error-msg" style={{ marginTop: 10 }}>Silakan pilih terlebih dahulu metode pembayarannya</div>}
-
-        {selectedMethod && (
-          <div className="account-card">
-            <div style={{ fontSize: 11, fontFamily: 'var(--font-mono)', color: 'var(--text-faint)', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 8 }}>
-              Detail {selectedMethod.name}
-            </div>
-            {selectedMethod.id === 'qris' ? (
-              <div style={{ display: 'flex', justifyContent: 'center', padding: 16 }}>
-                <div style={{ width: 180, height: 180, background: 'white', borderRadius: 12, padding: 12, border: '1.5px solid var(--border)' }}>
-                  <FakeQR />
-                </div>
-              </div>
-            ) : (
-              <>
-                <div className="account-row">
-                  <span className="account-label">No. Rekening</span>
-                  <span className="account-val">
-                    {selectedMethod.detail.split(' · ')[0]}
-                    <button
-                      className={'copy-btn' + (copied === selectedMethod.detail.split(' · ')[0] ? ' copied' : '')}
-                      onClick={() => copyAccount(selectedMethod.detail.split(' · ')[0])}
-                    >
-                      {copied === selectedMethod.detail.split(' · ')[0] ? '✓ Tersalin' : 'Salin'}
-                    </button>
-                  </span>
-                </div>
-                {selectedMethod.detail.includes(' · ') && (
-                  <div className="account-row">
-                    <span className="account-label">Atas nama</span>
-                    <span className="account-val">{selectedMethod.detail.split(' · ')[1].replace('a.n. ', '')}</span>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        )}
-      </div>
-
-      <div className="card">
-        <label className="label" style={{ marginBottom: 6 }}>
-          Unggah Bukti Transfer <span className="label-hint">— opsional, jika sudah melakukan transfer</span>
-        </label>
-        <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 12, marginTop: 0 }}>
-          Lewati tahap ini jika belum mendapatkan informasi nominal — Anda dapat mengirim buktinya nanti via WhatsApp setelah didiskusikan dengan admin.
-        </p>
-
-        {!form.proof ? (
-          <div
-            className={'upload-zone' + (dragOver ? ' dragging' : '')}
-            onClick={() => fileRef.current?.click()}
-            onDragOver={e => { e.preventDefault(); setDragOver(true); }}
-            onDragLeave={() => setDragOver(false)}
-            onDrop={e => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]); }}
-          >
-            <div className="upload-icon">↑</div>
-            <div className="upload-title">Ketuk atau letakkan bukti transfer di sini</div>
-            <div className="upload-hint">JPG, PNG, atau PDF · maks 5MB · opsional</div>
-            <input ref={fileRef} type="file" accept="image/*,application/pdf" hidden onChange={e => handleFile(e.target.files[0])} />
-          </div>
-        ) : (
-          <div className="upload-preview">
-            <div className="upload-thumb">
-              {form.proof.type?.startsWith('image/') ? <img src={form.proof.dataUrl} alt="preview" /> : '📄'}
-            </div>
-            <div className="upload-info">
-              <div className="upload-name">{form.proof.name}</div>
-              <div className="upload-meta">{(form.proof.size / 1024).toFixed(1)} KB · Siap dikirim</div>
-            </div>
-            <button className="upload-remove" onClick={() => upd('proof', null)}>✕</button>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function getLogoStyle(id) {
-  const map = {
-    bca: { background: '#0060AF', color: 'white', border: 'none' },
-    mandiri: { background: '#003D79', color: '#FFD700', border: 'none', fontSize: 10 },
-    dana: { background: '#118EEA', color: 'white', border: 'none' },
-    gopay: { background: '#00AED6', color: 'white', border: 'none' },
-    qris: { background: '#ED1C24', color: 'white', border: 'none' },
-  };
-  return map[id] || {};
-}
-
-function FakeQR() {
-  const cells = [];
-  const seed = 7;
-  for (let i = 0; i < 21; i++) {
-    for (let j = 0; j < 21; j++) {
-      const isFinder = (i < 7 && j < 7) || (i < 7 && j > 13) || (i > 13 && j < 7);
-      const isFinderInner =
-        ((i >= 2 && i <= 4) && (j >= 2 && j <= 4)) ||
-        ((i >= 2 && i <= 4) && (j >= 16 && j <= 18)) ||
-        ((i >= 16 && i <= 18) && (j >= 2 && j <= 4));
-      const hash = ((i * 31 + j * seed + i * j) % 5) === 0;
-      const fill = isFinderInner || (isFinder && (i === 0 || i === 6 || j === 0 || j === 6 || i === 14 || j === 14)) || (!isFinder && hash);
-      cells.push(<rect key={`${i}-${j}`} x={j * 7} y={i * 7} width={7} height={7} fill={fill ? '#0A0A0A' : 'transparent'} />);
-    }
-  }
-  return <svg viewBox="0 0 147 147" width="100%" height="100%"><rect width="147" height="147" fill="white" />{cells}</svg>;
-}
-
-// ============================================
-// SUCCESS SCREEN — with prominent WA link
+// SUCCESS SCREEN — dengan WhatsApp CTA
 // ============================================
 const ADMIN_WA = '6281234567890';
 
@@ -410,7 +237,7 @@ function SuccessScreen({ form, onReset, orderCode }) {
   const waUrl = `https://wa.me/${adminWa}?text=${waMsg}`;
 
   return (
-    <div className="success-shell step-content" data-screen-label="08 Success">
+    <div className="success-shell step-content" data-screen-label="07 Success">
       <div className="success-badge">✓</div>
       <h1 className="success-title">Pesanan Berhasil Dikirim!</h1>
       <p className="success-sub">
@@ -437,7 +264,7 @@ function SuccessScreen({ form, onReset, orderCode }) {
         <div className="next-steps-title">Langkah Selanjutnya</div>
         <NextStep n={1} title="Hubungi admin via WhatsApp" desc="Klik tombol di atas — admin akan otomatis mengetahui pesanan Anda dari kode pesanan." />
         <NextStep n={2} title="Diskusi spesifikasi & penawaran harga" desc="Admin akan meninjau cakupan Anda, lalu memberikan penawaran harga, tenggat waktu, dan instruksi DP." />
-        <NextStep n={3} title="Transfer DP & mulai pengerjaan" desc="Setelah kesepakatan, lakukan transfer DP via metode yang sudah dipilih — pengerjaan akan langsung dimulai." />
+        <NextStep n={3} title="Transfer DP & mulai pengerjaan" desc="Setelah kesepakatan, lakukan transfer DP — pengerjaan akan langsung dimulai." />
         <NextStep n={4} title="Pengiriman & pelunasan" desc="Aplikasi siap sesuai tenggat. Pelunasan dilakukan setelah pengerjaan selesai." />
       </div>
 
@@ -461,5 +288,5 @@ function NextStep({ n, title, desc }) {
 }
 
 Object.assign(window, {
-  StepSummary, StepPayment, SuccessScreen, PAYMENT_METHODS, ADMIN_WA,
+  StepSummary, SuccessScreen,
 });

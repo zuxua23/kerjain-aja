@@ -163,10 +163,18 @@ function InvoicePaper({ order, settings }) {
 
   const totals = useMemo(() => {
     const sub = (inv.items || []).reduce((acc, it) => acc + (Number(it.qty) || 0) * (Number(it.unitPrice) || 0), 0);
-    const afterDisc = sub - (Number(inv.discount) || 0);
+    const promoAmt = (() => {
+      const p = inv.promo;
+      if (!p || !p.active) return 0;
+      const v = Number(p.value) || 0;
+      if (p.type === 'percent') return Math.round((sub * v) / 100);
+      return Math.round(v);
+    })();
+    const afterPromo = sub - promoAmt;
+    const afterDisc = afterPromo - (Number(inv.discount) || 0);
     const withTax = afterDisc + (Number(inv.tax) || 0);
     const due = withTax - (Number(inv.paid) || 0);
-    return { sub, afterDisc, withTax, due };
+    return { sub, promoAmt, afterPromo, afterDisc, withTax, due };
   }, [inv]);
 
   const isPaid = (inv.paid || 0) >= totals.withTax;
@@ -186,8 +194,11 @@ function InvoicePaper({ order, settings }) {
         <div>
           <div className="inv-party-label">Ditagihkan kepada</div>
           <div className="inv-party-name">{f.name || '—'}</div>
-          <div className="inv-party-line">+62{f.wa}</div>
+          {f.wa && <div className="inv-party-line">+62{f.wa}</div>}
           {f.email && <div className="inv-party-line">{f.email}</div>}
+          {(f.customFields || []).map((cf, i) => (
+            <div key={i} className="inv-party-line"><strong>{cf.label}:</strong> {cf.value}</div>
+          ))}
         </div>
         <div>
           <div className="inv-party-label">Dari</div>
@@ -223,6 +234,16 @@ function InvoicePaper({ order, settings }) {
       <div className="inv-totals">
         <div className="inv-totals-box">
           <div className="inv-total-row"><span>Subtotal</span><strong>{rupiah(totals.sub)}</strong></div>
+          {inv.promo?.active && totals.promoAmt > 0 && (
+            <div className="inv-total-row inv-total-promo">
+              <span>
+                🎟️ Promo
+                {inv.promo.label ? ` (${inv.promo.label})` : ''}
+                {inv.promo.type === 'percent' ? ` — ${Number(inv.promo.value) || 0}%` : ''}
+              </span>
+              <strong>−{rupiah(totals.promoAmt)}</strong>
+            </div>
+          )}
           {Number(inv.discount) > 0 && (
             <div className="inv-total-row"><span>Diskon</span><strong>−{rupiah(inv.discount)}</strong></div>
           )}
@@ -275,6 +296,7 @@ function BastPaper({ order, settings }) {
     landing: 'Pembuatan Landing Page',
     revision: 'Revisi / Perbaikan Aplikasi',
   })[sid] || sid).filter(Boolean);
+  const isManual = !!order.manual;
 
   return (
     <div className="inv-paper">
@@ -301,8 +323,11 @@ function BastPaper({ order, settings }) {
           <div>
             <div className="inv-party-label">PIHAK KEDUA (Pemberi Kerja)</div>
             <div className="inv-party-name">{inv.customerSigner || f.name}</div>
-            <div className="inv-party-line">+62{f.wa}</div>
+            {f.wa && <div className="inv-party-line">+62{f.wa}</div>}
             {f.email && <div className="inv-party-line">{f.email}</div>}
+            {(f.customFields || []).map((cf, i) => (
+              <div key={i} className="inv-party-line"><strong>{cf.label}:</strong> {cf.value}</div>
+            ))}
           </div>
         </div>
 
@@ -317,7 +342,9 @@ function BastPaper({ order, settings }) {
           <ul>
             {serviceLabels.length > 0
               ? serviceLabels.map((s, i) => <li key={i}>{s}</li>)
-              : <li>(tidak ada jasa terdaftar)</li>}
+              : isManual
+                ? <li>Pekerjaan sesuai rincian invoice (lihat item di bawah)</li>
+                : <li>(tidak ada jasa terdaftar)</li>}
           </ul>
           {(inv.items || []).length > 0 && (
             <>

@@ -23,7 +23,7 @@ const INITIAL_FORM = {
 
 const TWEAK_DEFAULTS = /*EDITMODE-BEGIN*/{
   "theme": "light",
-  "primaryColor": "#5B3FE5",
+  "primaryColor": "#176B87",
   "fontPair": "jakarta"
 }/*EDITMODE-END*/;
 
@@ -79,14 +79,15 @@ function App() {
   }, [t.theme]);
 
   useEffect(() => {
+    const target = document.body;
     if (t.theme === 'light' && t.primaryColor) {
-      document.documentElement.style.setProperty('--primary', t.primaryColor);
-      document.documentElement.style.setProperty('--primary-hover', adjust(t.primaryColor, -15));
-      document.documentElement.style.setProperty('--primary-soft', hexToRgba(t.primaryColor, 0.12));
+      target.style.setProperty('--primary', t.primaryColor);
+      target.style.setProperty('--primary-hover', adjust(t.primaryColor, -15));
+      target.style.setProperty('--primary-soft', hexToRgba(t.primaryColor, 0.12));
     } else {
-      document.documentElement.style.removeProperty('--primary');
-      document.documentElement.style.removeProperty('--primary-hover');
-      document.documentElement.style.removeProperty('--primary-soft');
+      target.style.removeProperty('--primary');
+      target.style.removeProperty('--primary-hover');
+      target.style.removeProperty('--primary-soft');
     }
   }, [t.primaryColor, t.theme]);
 
@@ -197,6 +198,7 @@ function App() {
   if (done) {
     return (
       <>
+        <Topbar />
         <div className="main">
           <SuccessScreen form={form} onReset={reset} orderCode={submittedOrder?.code} />
         </div>
@@ -207,6 +209,7 @@ function App() {
 
   return (
     <div className="app">
+      <Topbar />
       <Stepper steps={STEPS} step={step} />
 
       <div className="main">
@@ -247,8 +250,22 @@ function App() {
 }
 
 function Topbar() {
-  // Topbar dihapus dari customer form (hanya kept sebagai stub kalau-kalau dipakai).
-  return null;
+  return (
+    <header className="topbar">
+      <a href="index.html" className="logo" style={{ textDecoration: 'none' }}>
+        <div className="logo-mark">KA</div>
+        <span>Kerjain Aja</span>
+      </a>
+      <div className="topbar-meta">
+        <a href="index.html" className="btn-back-landing">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Kembali ke Landing
+        </a>
+      </div>
+    </header>
+  );
 }
 
 function Stepper({ steps, step }) {
@@ -289,7 +306,7 @@ function TweaksUI({ t, setTweak }) {
           label="Aksen"
           value={t.primaryColor}
           onChange={v => setTweak('primaryColor', v)}
-          options={['#5B3FE5', '#0891B2', '#16A34A', '#DC2626', '#EA580C']}
+          options={['#176B87', '#86B6F6', '#5B3FE5', '#0891B2', '#16A34A', '#DC2626']}
         />
       )}
 

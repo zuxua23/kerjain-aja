@@ -384,3 +384,16 @@ html, body {
   .inv-totals-box { width: 100%; }
   .inv-signatures { grid-template-columns: 1fr; gap: 50px; }
 }
+
+
+/* PROMO LINE in invoice paper */
+.inv-total-promo {
+  color: #c25a3d;
+  background: rgba(217, 119, 87, 0.06);
+  border-radius: 6px;
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+}
+.inv-total-promo strong {
+  color: #c25a3d;
+}
